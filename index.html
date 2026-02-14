@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍎 Մրգային Շախմատ 🥬</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans Armenian', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            animation: titleGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
+            50% { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 40px rgba(255,255,255,0.6); }
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .machine-container {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            min-width: 200px;
+            transition: transform 0.3s;
+        }
+
+        .machine-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .machine-title {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .blender, .chopper {
+            width: 150px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .blender-base {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .blender-jar {
+            position: absolute;
+            bottom: 60px;
+            left: 25px;
+            width: 100px;
+            height: 120px;
+            background: rgba(255,255,255,0.3);
+            border: 3px solid rgba(255,255,255,0.5);
+            border-radius: 10px 10px 20px 20px;
+            overflow: hidden;
+        }
+
+        .blender-content {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #ff6b6b, #feca57);
+            transition: height 0.5s;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-end;
+            justify-content: center;
+            padding: 5px;
+            gap: 2px;
+        }
+
+        .chopper-base {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 10px;
+        }
+
+        .chopper-bowl {
+            position: absolute;
+            bottom: 60px;
+            left: 25px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .chopper-content {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #48bb78, #68d391);
+            transition: height 0.5s;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-end;
+            justify-content: center;
+            padding: 5px;
+            gap: 2px;
+        }
+
+        .blade {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 4px;
+            background: #cbd5e0;
+            border-radius: 2px;
+        }
+
+        .blade::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(90deg);
+            width: 60px;
+            height: 4px;
+            background: #cbd5e0;
+            border-radius: 2px;
+        }
+
+        .spinning {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .captured-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+            min-height: 40px;
+            justify-content: center;
+        }
+
+        .captured-item {
+            font-size: 1.5rem;
+            animation: dropIn 0.5s ease-out;
+        }
+
+        @keyframes dropIn {
+            0% { transform: translateY(-20px) scale(0); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .board-container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 70px);
+            grid-template-rows: repeat(8, 70px);
+            gap: 0;
+            border: 4px solid #4a5568;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .square {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .square:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .white {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+
+        .black {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .square.selected {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
+            animation: pulse 1s infinite;
+        }
+
+        .square.valid-move {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+            position: relative;
+        }
+
+        .square.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .square.last-move {
+            box-shadow: inset 0 0 0 4px #ffd700;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .piece {
+            transition: all 0.3s ease;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            cursor: pointer;
+        }
+
+        .piece:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.4));
+        }
+
+        .current-player {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .cook-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            animation: cookPulse 2s infinite;
+        }
+
+        @keyframes cookPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4); }
+            50% { box-shadow: 0 4px 30px rgba(245, 87, 108, 0.8); }
+        }
+
+        .cats-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .cat {
+            position: absolute;
+            bottom: -200px;
+            width: 150px;
+            height: 150px;
+            transition: all 1s ease-out;
+            cursor: pointer;
+            pointer-events: all;
+        }
+
+        .cat.orange {
+            left: 20%;
+            filter: hue-rotate(0deg) brightness(1.2);
+        }
+
+        .cat.brown {
+            right: 20%;
+            filter: sepia(0.5) brightness(0.8);
+        }
+
+        .cat.active {
+            bottom: 20px;
+        }
+
+        .cat img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .cat-eating {
+            animation: eat 1s ease-in-out infinite;
+        }
+
+        @keyframes eat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(-5deg); }
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #333;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        .speech-bubble.show {
+            opacity: 1;
+        }
+
+        .check-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 1000;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+        }
+
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #68d391);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 5px;
+        }
+
+        .result-text {
+            color: white;
+            margin-top: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .result-text.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .side-panel {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">🔊</button>
+    
+    <h1>🍎 Մրգային Շախմատ 🥬</h1>
+    <div class="current-player" id="currentPlayer">Հերթը՝ Սպիտակ (Մրգեր)</div>
+
+    <div class="game-container">
+        <!-- Բլենդեր (ՁԱԽ) - Սպիտակների համար (մրգեր) -->
+        <div class="side-panel">
+            <div class="machine-container">
+                <div class="machine-title">🥤 Բլենդեր (Մրգեր)</div>
+                <div class="blender">
+                    <div class="blender-jar">
+                        <div class="blender-content" id="blenderContent"></div>
+                    </div>
+                    <div class="blender-base">⚡</div>
+                </div>
+                <div class="captured-items" id="whiteCaptured"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="blenderProgress"></div>
+                </div>
+                <div class="result-text" id="juiceText">🧃 Ֆրեշը պատրաստ է!</div>
+            </div>
+        </div>
+
+        <!-- Տախտակ -->
+        <div class="board-container">
+            <div class="chess-board" id="board"></div>
+            <div class="controls">
+                <button onclick="resetGame()">🔄 Նոր Խաղ</button>
+                <button onclick="undoMove()">↩️ Վերադառնալ</button>
+                <button class="cook-btn" onclick="cookAll()">👨‍🍳 Պատրաստել</button>
+            </div>
+        </div>
+
+        <!-- Աղցանաման (ԱՋ) - Սևերի համար (բանջարեղեն) -->
+        <div class="side-panel">
+            <div class="machine-container">
+                <div class="machine-title">🔪 Աղցանաման (Բանջարեղեն)</div>
+                <div class="chopper">
+                    <div class="chopper-bowl">
+                        <div class="chopper-content" id="chopperContent"></div>
+                        <div class="blade" id="chopperBlade"></div>
+                    </div>
+                    <div class="chopper-base"></div>
+                </div>
+                <div class="captured-items" id="blackCaptured"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="chopperProgress"></div>
+                </div>
+                <div class="result-text" id="saladText">🥗 Աղցանը պատրաստ է!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Կատուներ -->
+    <div class="cats-container">
+        <div class="cat orange" id="orangeCat">
+            <div class="speech-bubble" id="orangeBubble">Համով ֆրեշ է! 😋</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" alt="Orange Cat">
+        </div>
+        <div class="cat brown" id="brownCat">
+            <div class="speech-bubble" id="brownBubble">Շատ համեղ աղցան! 😸</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" alt="Brown Cat">
+        </div>
+    </div>
+
+    <div class="check-warning" id="checkWarning">Շախ! ⚠️</div>
+
+    <script>
+        // Խաղի վիճակ
+        let board = [];
+        let selectedPiece = null;
+        let currentPlayer = 'white';
+        let moveHistory = [];
+        let capturedByWhite = [];
+        let capturedByBlack = [];
+        let lastMove = null;
+        let soundEnabled = true;
+        let isCooking = false;
+
+        // Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'move':
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+                case 'capture':
+                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                case 'check':
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'blender':
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                    oscillator.frequency.linearRampToValueAtTime(200, audioContext.currentTime + 2);
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 2);
+                    break;
+                case 'chopper':
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+                    for(let i = 0; i < 10; i++) {
+                        oscillator.frequency.setValueAtTime(150 + Math.random() * 100, audioContext.currentTime + i * 0.2);
+                    }
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 2);
+                    break;
+                case 'eat':
+                    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = soundEnabled ? '🔊' : '🔇';
+        }
+
+        // Խաղաքարերի սահմանում
+        const PIECES = {
+            white: {
+                king: '🍉',
+                queen: '🍓',
+                rook: '🍍',
+                bishop: '🍊',
+                knight: '🍇',
+                pawn: '🍎'
+            },
+            black: {
+                king: '🥑',
+                queen: '🍆',
+                rook: '🥕',
+                bishop: '🌶️',
+                knight: '🥦',
+                pawn: '🥬'
+            }
+        };
+
+        function initializeBoard() {
+            board = [
+                [{type: 'rook', color: 'black'}, {type: 'knight', color: 'black'}, {type: 'bishop', color: 'black'}, {type: 'queen', color: 'black'}, {type: 'king', color: 'black'}, {type: 'bishop', color: 'black'}, {type: 'knight', color: 'black'}, {type: 'rook', color: 'black'}],
+                [{type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}],
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                [null, null, null, null, null, null, null, null],
+                [{type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}],
+                [{type: 'rook', color: 'white'}, {type: 'knight', color: 'white'}, {type: 'bishop', color: 'white'}, {type: 'queen', color: 'white'}, {type: 'king', color: 'white'}, {type: 'bishop', color: 'white'}, {type: 'knight', color: 'white'}, {type: 'rook', color: 'white'}]
+            ];
+        }
+
+        function renderBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+
+                    const piece = board[row][col];
+                    if (piece) {
+                        const pieceSpan = document.createElement('span');
+                        pieceSpan.className = 'piece';
+                        pieceSpan.textContent = PIECES[piece.color][piece.type];
+                        square.appendChild(pieceSpan);
+                    }
+
+                    if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+                        square.classList.add('selected');
+                    }
+
+                    if (lastMove && ((lastMove.from.row === row && lastMove.from.col === col) || 
+                        (lastMove.to.row === row && lastMove.to.col === col))) {
+                        square.classList.add('last-move');
+                    }
+
+                    square.addEventListener('click', () => handleSquareClick(row, col));
+                    boardElement.appendChild(square);
+                }
+            }
+
+            if (selectedPiece) {
+                const validMoves = getValidMoves(selectedPiece.row, selectedPiece.col);
+                validMoves.forEach(move => {
+                    const index = move.row * 8 + move.col;
+                    boardElement.children[index].classList.add('valid-move');
+                });
+            }
+        }
+
+        function getValidMoves(row, col) {
+            const piece = board[row][col];
+            if (!piece) return [];
+
+            const moves = [];
+            const direction = piece.color === 'white' ? -1 : 1;
+
+            switch(piece.type) {
+                case 'pawn':
+                    if (isValidPosition(row + direction, col) && !board[row + direction][col]) {
+                        moves.push({row: row + direction, col: col});
+                        if ((piece.color === 'white' && row === 6) || (piece.color === 'black' && row === 1)) {
+                            if (!board[row + 2 * direction][col]) {
+                                moves.push({row: row + 2 * direction, col: col});
+                            }
+                        }
+                    }
+                    for (let dcol of [-1, 1]) {
+                        const newRow = row + direction;
+                        const newCol = col + dcol;
+                        if (isValidPosition(newRow, newCol)) {
+                            const target = board[newRow][newCol];
+                            if (target && target.color !== piece.color) {
+                                moves.push({row: newRow, col: newCol});
+                            }
+                        }
+                    }
+                    break;
+
+                case 'knight':
+                    const knightMoves = [[-2,-1], [-2,1], [-1,-2], [-1,2], [1,-2], [1,2], [2,-1], [2,1]];
+                    knightMoves.forEach(([dr, dc]) => {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        if (isValidPosition(newRow, newCol)) {
+                            const target = board[newRow][newCol];
+                            if (!target || target.color !== piece.color) {
+                                moves.push({row: newRow, col: newCol});
+                            }
+                        }
+                    });
+                    break;
+
+                case 'bishop':
+                    moves.push(...getSlidingMoves(row, col, [[-1,-1], [-1,1], [1,-1], [1,1]]));
+                    break;
+
+                case 'rook':
+                    moves.push(...getSlidingMoves(row, col, [[-1,0], [1,0], [0,-1], [0,1]]));
+                    break;
+
+                case 'queen':
+                    moves.push(...getSlidingMoves(row, col, [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]));
+                    break;
+
+                case 'king':
+                    const kingMoves = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]];
+                    kingMoves.forEach(([dr, dc]) => {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        if (isValidPosition(newRow, newCol)) {
+                            const target = board[newRow][newCol];
+                            if (!target || target.color !== piece.color) {
+                                moves.push({row: newRow, col: newCol});
+                            }
+                        }
+                    });
+                    break;
+            }
+
+            return moves.filter(move => !wouldBeInCheck(piece.color, row, col, move.row, move.col));
+        }
+
+        function getSlidingMoves(row, col, directions) {
+            const moves = [];
+            const piece = board[row][col];
+            
+            directions.forEach(([dr, dc]) => {
+                let newRow = row + dr;
+                let newCol = col + dc;
+                
+                while (isValidPosition(newRow, newCol)) {
+                    const target = board[newRow][newCol];
+                    if (!target) {
+                        moves.push({row: newRow, col: newCol});
+                    } else {
+                        if (target.color !== piece.color) {
+                            moves.push({row: newRow, col: newCol});
+                        }
+                        break;
+                    }
+                    newRow += dr;
+                    newCol += dc;
+                }
+            });
+            
+            return moves;
+        }
+
+        function isValidPosition(row, col) {
+            return row >= 0 && row < 8 && col >= 0 && col < 8;
+        }
+
+        function wouldBeInCheck(color, fromRow, fromCol, toRow, toCol) {
+            const tempBoard = JSON.parse(JSON.stringify(board));
+            const piece = tempBoard[fromRow][fromCol];
+            tempBoard[toRow][toCol] = piece;
+            tempBoard[fromRow][fromCol] = null;
+
+            let kingPos = null;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (tempBoard[r][c] && tempBoard[r][c].type === 'king' && tempBoard[r][c].color === color) {
+                        kingPos = {row: r, col: c};
+                        break;
+                    }
+                }
+                if (kingPos) break;
+            }
+
+            return isSquareAttacked(kingPos.row, kingPos.col, color, tempBoard);
+        }
+
+        function isSquareAttacked(row, col, defendingColor, boardState = board) {
+            const attackingColor = defendingColor === 'white' ? 'black' : 'white';
+            
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = boardState[r][c];
+                    if (piece && piece.color === attackingColor) {
+                        if (canAttackSquare(piece, r, c, row, col, boardState)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function canAttackSquare(piece, fromRow, fromCol, toRow, toCol, boardState) {
+            const dr = toRow - fromRow;
+            const dc = toCol - fromCol;
+
+            switch(piece.type) {
+                case 'pawn':
+                    const direction = piece.color === 'white' ? -1 : 1;
+                    return dr === direction && Math.abs(dc) === 1;
+
+                case 'knight':
+                    return (Math.abs(dr) === 2 && Math.abs(dc) === 1) || (Math.abs(dr) === 1 && Math.abs(dc) === 2);
+
+                case 'king':
+                    return Math.abs(dr) <= 1 && Math.abs(dc) <= 1;
+
+                case 'bishop':
+                    if (Math.abs(dr) !== Math.abs(dc)) return false;
+                    return isPathClear(fromRow, fromCol, toRow, toCol, boardState);
+
+                case 'rook':
+                    if (dr !== 0 && dc !== 0) return false;
+                    return isPathClear(fromRow, fromCol, toRow, toCol, boardState);
+
+                case 'queen':
+                    if (Math.abs(dr) !== Math.abs(dc) && dr !== 0 && dc !== 0) return false;
+                    return isPathClear(fromRow, fromCol, toRow, toCol, boardState);
+            }
+            return false;
+        }
+
+        function isPathClear(fromRow, fromCol, toRow, toCol, boardState) {
+            const dr = Math.sign(toRow - fromRow);
+            const dc = Math.sign(toCol - fromCol);
+            let r = fromRow + dr;
+            let c = fromCol + dc;
+
+            while (r !== toRow || c !== toCol) {
+                if (boardState[r][c]) return false;
+                r += dr;
+                c += dc;
+            }
+            return true;
+        }
+
+        function handleSquareClick(row, col) {
+            if (isCooking) return;
+            
+            const piece = board[row][col];
+
+            if (selectedPiece) {
+                const validMoves = getValidMoves(selectedPiece.row, selectedPiece.col);
+                const move = validMoves.find(m => m.row === row && m.col === col);
+
+                if (move) {
+                    makeMove(selectedPiece.row, selectedPiece.col, row, col);
+                    selectedPiece = null;
+                    return;
+                }
+            }
+
+            if (piece && piece.color === currentPlayer) {
+                selectedPiece = {row, col, piece};
+            } else {
+                selectedPiece = null;
+            }
+
+            renderBoard();
+        }
+
+        function makeMove(fromRow, fromCol, toRow, toCol) {
+            const piece = board[fromRow][fromCol];
+            const captured = board[toRow][toCol];
+
+            moveHistory.push({
+                from: {row: fromRow, col: fromCol},
+                to: {row: toRow, col: toCol},
+                piece: {...piece},
+                captured: captured ? {...captured} : null
+            });
+
+            if (captured) {
+                playSound('capture');
+                // ՈՒՂՂՎԱԾ՝ սպիտակները (մրգեր) բլենդեր, սևերը (բանջարեղեն) աղցանաման
+                if (captured.color === 'white') {
+                    // Սպիտակ մրգերը սևը կերավ → բլենդեր
+                    capturedByBlack.push(captured);
+                    addToMachine('blender', captured);
+                } else {
+                    // Սև բանջարեղենը սպիտակը կերավ → աղցանաման
+                    capturedByWhite.push(captured);
+                    addToMachine('chopper', captured);
+                }
+            } else {
+                playSound('move');
+            }
+
+            board[toRow][toCol] = piece;
+            board[fromRow][fromCol] = null;
+            lastMove = {from: {row: fromRow, col: fromCol}, to: {row: toRow, col: toCol}};
+
+            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            document.getElementById('currentPlayer').textContent = 
+                `Հերթը՝ ${currentPlayer === 'white' ? 'Սպիտակ (Մրգեր)' : 'Սև (Բանջարեղեն)'}`;
+
+            checkForCheck();
+
+            if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
+                board[toRow][toCol].type = 'queen';
+            }
+
+            updateCapturedDisplay();
+            renderBoard();
+        }
+
+        function addToMachine(machine, piece) {
+            const container = machine === 'blender' ? document.getElementById('blenderContent') : document.getElementById('chopperContent');
+            const item = document.createElement('div');
+            item.className = 'captured-item';
+            item.textContent = PIECES[piece.color][piece.type];
+            item.style.fontSize = '1.2rem';
+            container.appendChild(item);
+            
+            // Update height based on content
+            const count = container.children.length;
+            const height = Math.min(count * 15, 100);
+            container.style.height = height + '%';
+        }
+
+        function checkForCheck() {
+            let kingPos = null;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = board[r][c];
+                    if (piece && piece.type === 'king' && piece.color === currentPlayer) {
+                        kingPos = {row: r, col: c};
+                        break;
+                    }
+                }
+                if (kingPos) break;
+            }
+
+            if (kingPos && isSquareAttacked(kingPos.row, kingPos.col, currentPlayer)) {
+                playSound('check');
+                showCheckWarning();
+            }
+        }
+
+        function showCheckWarning() {
+            const warning = document.getElementById('checkWarning');
+            warning.style.display = 'block';
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateCapturedDisplay() {
+            // Ցույց ենք տալիս ով ինչ է կերել
+            const whiteDiv = document.getElementById('whiteCaptured');
+            const blackDiv = document.getElementById('blackCaptured');
+            
+            // Սպիտակը կերած բանջարեղենը (աղցանամանում)
+            whiteDiv.innerHTML = capturedByWhite.map(p => PIECES[p.color][p.type]).join(' ');
+            // Սևը կերած մրգերը (բլենդերում)
+            blackDiv.innerHTML = capturedByBlack.map(p => PIECES[p.color][p.type]).join(' ');
+        }
+
+        function cookAll() {
+            if (isCooking) return;
+            isCooking = true;
+
+            const blender = document.getElementById('blenderContent');
+            const chopper = document.getElementById('chopperContent');
+            const blade = document.getElementById('chopperBlade');
+            const blenderProgress = document.getElementById('blenderProgress');
+            const chopperProgress = document.getElementById('chopperProgress');
+            const juiceText = document.getElementById('juiceText');
+            const saladText = document.getElementById('saladText');
+
+            // Animate machines
+            if (capturedByBlack.length > 0) {
+                playSound('blender');
+                blender.style.animation = 'shake 0.5s infinite';
+                blenderProgress.style.width = '100%';
+            }
+            
+            if (capturedByWhite.length > 0) {
+                playSound('chopper');
+                blade.classList.add('spinning');
+                chopperProgress.style.width = '100%';
+            }
+
+            setTimeout(() => {
+                blender.style.animation = '';
+                blade.classList.remove('spinning');
+                
+                if (capturedByBlack.length > 0) {
+                    juiceText.classList.add('show');
+                    blender.innerHTML = '🧃';
+                    blender.style.height = '80%';
+                }
+                
+                if (capturedByWhite.length > 0) {
+                    saladText.classList.add('show');
+                    chopper.innerHTML = '🥗';
+                    chopper.style.height = '80%';
+                }
+
+                // Show cats after cooking
+                setTimeout(() => {
+                    showCats();
+                }, 500);
+            }, 2000);
+        }
+
+        function showCats() {
+            const orangeCat = document.getElementById('orangeCat');
+            const brownCat = document.getElementById('brownCat');
+            const orangeBubble = document.getElementById('orangeBubble');
+            const brownBubble = document.getElementById('brownBubble');
+
+            // Նարնջագույն կատուն խմում է ֆրեշը (մրգերից)
+            if (capturedByBlack.length > 0) {
+                orangeCat.classList.add('active');
+                setTimeout(() => {
+                    orangeBubble.classList.add('show');
+                    orangeCat.classList.add('cat-eating');
+                    playSound('eat');
+                }, 1000);
+            }
+
+            // Դարչնագույն կատուն ուտում է աղցանը (բանջարեղենից)
+            if (capturedByWhite.length > 0) {
+                setTimeout(() => {
+                    brownCat.classList.add('active');
+                    setTimeout(() => {
+                        brownBubble.classList.add('show');
+                        brownCat.classList.add('cat-eating');
+                        playSound('eat');
+                    }, 1000);
+                }, 500);
+            }
+
+            // Reset after eating
+            setTimeout(() => {
+                orangeCat.classList.remove('active', 'cat-eating');
+                brownCat.classList.remove('active', 'cat-eating');
+                orangeBubble.classList.remove('show');
+                brownBubble.classList.remove('show');
+                isCooking = false;
+            }, 5000);
+        }
+
+        function undoMove() {
+            if (moveHistory.length === 0 || isCooking) return;
+            
+            const last = moveHistory.pop();
+            board[last.from.row][last.from.col] = last.piece;
+            board[last.to.row][last.to.col] = last.captured;
+
+            if (last.captured) {
+                // ՈՒՂՂՎԱԾ՝ վերականգնում ենք ճիշտ սարքից
+                if (last.captured.color === 'white') {
+                    capturedByBlack.pop();
+                    removeFromMachine('blender');
+                } else {
+                    capturedByWhite.pop();
+                    removeFromMachine('chopper');
+                }
+            }
+
+            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            document.getElementById('currentPlayer').textContent = 
+                `Հերթը՝ ${currentPlayer === 'white' ? 'Սպիտակ (Մրգեր)' : 'Սև (Բանջարեղեն)'}`;
+            
+            lastMove = moveHistory.length > 0 ? {
+                from: moveHistory[moveHistory.length-1].from,
+                to: moveHistory[moveHistory.length-1].to
+            } : null;
+
+            selectedPiece = null;
+            updateCapturedDisplay();
+            renderBoard();
+        }
+
+        function removeFromMachine(machine) {
+            const container = machine === 'blender' ? document.getElementById('blenderContent') : document.getElementById('chopperContent');
+            if (container.lastChild) {
+                container.removeChild(container.lastChild);
+            }
+            const count = container.children.length;
+            const height = Math.min(count * 15, 100);
+            container.style.height = height + '%';
+        }
+
+        function resetGame() {
+            initializeBoard();
+            currentPlayer = 'white';
+            selectedPiece = null;
+            moveHistory = [];
+            capturedByWhite = [];
+            capturedByBlack = [];
+            lastMove = null;
+            isCooking = false;
+            
+            // Reset machines
+            document.getElementById('blenderContent').innerHTML = '';
+            document.getElementById('blenderContent').style.height = '0%';
+            document.getElementById('chopperContent').innerHTML = '';
+            document.getElementById('chopperContent').style.height = '0%';
+            document.getElementById('blenderProgress').style.width = '0%';
+            document.getElementById('chopperProgress').style.width = '0%';
+            document.getElementById('juiceText').classList.remove('show');
+            document.getElementById('saladText').classList.remove('show');
+            
+            // Hide cats
+            document.getElementById('orangeCat').classList.remove('active');
+            document.getElementById('brownCat').classList.remove('active');
+            
+            document.getElementById('currentPlayer').textContent = 'Հերթը՝ Սպիտակ (Մրգեր)';
+            updateCapturedDisplay();
+            renderBoard();
+        }
+
+        // Initialize
+        initializeBoard();
+        renderBoard();
+    </script>
+</body>
+</html>
